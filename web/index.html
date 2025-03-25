@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting...</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const uid = urlParams.get("uid");
+            if (!uid) {
+                alert("Missing UID. Please access a valid link.");
+                window.location.href = "invalid.html"; // Redirect to an invalid page
+                return;
+            } 
+
+            // Check user status from the backend
+            console.log("UID:", uid);
+
+            fetch(`http://localhost:5001/user/status?uid=${uid}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("User Status API Response:", data);  // Log response
+            
+                    if (data.error) {
+                        window.location.href = "invalid.html"; // Invalid UID
+                    } else if (data.redirect) {
+                        window.location.href = data.redirect; // Redirect to appropriate page
+                    }
+                })
+            .catch(error => {
+                console.error("Error checking user status:", error);
+                window.location.href = "invalid.html"; // Handle any failures
+            }); 
+        });
+    </script>
+</head>
+<body>
+    <h2>Checking your status, please wait...</h2>
+</body>
+</html>

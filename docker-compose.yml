@@ -1,0 +1,56 @@
+services:
+  web:
+    build: ./web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./web:/usr/share/nginx/html
+    depends_on:
+      - backend
+      - admin_dashboard
+
+  backend:
+    build: ./backend
+    ports:
+      - "5001:5000"
+    # environment:
+    #   - DATABASE_URL=postgresql://user:password@db/surveydb
+    #   - LLM_API_KEY=your_llm_api_key
+
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: surveydb
+    command: postgres -c 'password_encryption=md5'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  admin_dashboard:
+    build: ./admin_dashboard
+    ports:
+      - "3001:3000"
+    depends_on:
+      - backend
+
+  metabase:
+    image: metabase/metabase
+    ports:
+      - "3002:3000"
+    environment:
+      MB_DB_FILE: /metabase.db
+    volumes:
+      - ./metabase-data:/metabase.db
+    depends_on:
+      - db
+
+
+
+volumes:
+  pgdata:

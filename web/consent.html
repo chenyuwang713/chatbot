@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consent Page – Personality Traits of Education Leaders</title>
+  <style>
+    body {
+      margin: 0; 
+      padding: 0; 
+      font-family: Arial, sans-serif; 
+      background-color: #f8f8f8;
+    }
+    .container {
+      max-width: 800px; 
+      margin: 40px auto; 
+      background-color: #fff; 
+      padding: 30px; 
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .logo {
+      display: block; 
+      margin: 0 auto 20px; 
+      width: 100px; /* Adjust as needed */
+    }
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+    p {
+      line-height: 1.6; 
+      color: #555;
+    }
+    .buttons {
+      text-align: center; 
+      margin-top: 30px;
+    }
+    button {
+      background-color: #0078D4; 
+      border: none; 
+      color: #fff; 
+      padding: 12px 24px; 
+      margin: 0 10px; 
+      font-size: 16px; 
+      cursor: pointer; 
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #005fa3;
+    }
+    hr {
+      margin-top: 30px;
+    }
+    .footer {
+      text-align: center; 
+      font-size: 0.9em; 
+      color: #999; 
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Logo at the top (Update 'logo.png' if needed) -->
+    <img src="logo.png" alt="Organization Logo" class="logo"/>
+
+    <h1>Personality Traits of Education Leaders and School Climate</h1>
+    <hr/>
+
+    <!-- Intro / Consent Text -->
+    <p><strong>Principal Investigator:</strong><br/>
+      Dr. Kevin Fortner<br/>
+      Associate Professor, Georgia State University
+    </p>
+
+    <p><strong>Student Investigator:</strong><br/>
+      Qurrat ul Ain Rasheed (<a href="mailto:qrasheed1@gsu.edu">qrasheed1@gsu.edu</a>)<br/>
+      PhD Candidate (Education Policy)<br/>
+      College of Education and Human Development, Georgia State University
+    </p>
+
+    <p><strong>Technique Support:</strong><br/>
+      Dr. Chenyu Wang<br/>
+      Assistant Professor <br/>
+      Department of Software Engineering and Game Development, Kennesaw State University
+    </p>
+
+    <p><strong>Funding Information:</strong> N/A</p>
+
+    <p>
+      You are invited to participate in a research study that seeks to understand various
+      psychological and behavioral factors related to leadership in educational settings.
+    </p>
+
+    <h2>Procedures</h2>
+    <p>
+      If you agree to participate, you will complete a series of questions that assess thoughts, 
+      feelings, and behaviors in different situations. The survey will take approximately 20 minutes 
+      to complete. You may skip any questions you prefer not to answer.
+    </p>
+
+    <h2>Voluntary Participation</h2>
+    <p>
+      Your participation in this study is entirely voluntary. You may skip questions, choose not 
+      to participate, or withdraw from the study at any time without penalty. If you choose to 
+      withdraw, any data you have provided will not be used in the study.
+    </p>
+
+    <h2>Confidentiality</h2>
+    <p>
+      All responses you provide will be kept strictly confidential. Your data will be stored securely 
+      and used solely for research purposes. Your responses will not be linked to your identity or 
+      shared outside the research team.
+    </p>
+
+    <h2>Potential Risks and Benefits</h2>
+    <p>
+      The risks to participants of this study are minimal. Risks include the time burden of 
+      participation and possible psychological discomfort from questions encountered during the 
+      study. Questions about beliefs, personal experiences, or opinions may lead to feelings of 
+      anxiety, self-reflection, or stress. You may discontinue at any time without consequences. 
+      No personally identifiable information is collected during the study, and your responses 
+      will be kept confidential.
+    </p>
+
+    <p>
+      If you have any questions about the study or your rights as a participant, please contact 
+      <strong><a href="mailto:qrasheed1@gsu.edu">Qurrat ul Ain Rasheed</a></strong> or the Principal Investigator, 
+      <strong><a href="mailto:cfortner2@gsu.edu">Dr. Kevin Fortner</a></strong>. 
+      If you would like to contact the GSU IRB office regarding questions, concerns, or complaints, 
+      please email <strong><a href="mailto:irb@gsu.edu">irb@gsu.edu</a></strong>.
+    </p>
+
+    <p>
+      By clicking “I agree” below, you are indicating that you voluntarily agree to participate 
+      in this study. If you do not wish to participate, you may select “I do not agree.”
+    </p>
+
+    <!-- Buttons to continue or decline -->
+    <div class="buttons">
+      <button id="agree-btn">I agree</button>
+      <button onclick="window.location.href='noagree.html'">I do not agree</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const uid = urlParams.get("uid");
+        
+            document.getElementById("agree-btn").addEventListener("click", function () {
+              if (!uid) {
+                  alert("Missing UID. Please access this page with a valid UID.");
+                  return;
+              }
+          
+              fetch("http://localhost:5001/update_consent", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ uid: uid })
+              })
+              .then(response => {
+                  if (!response.ok) {
+                      return response.text().then(text => { throw new Error(text) }); // Convert HTML errors to text
+                  }
+                  return response.json();
+              })
+              .then(data => {
+                  if (data.success) {
+                      window.location.href = `survey.html?uid=${uid}`;
+                  } else {
+                      alert("Error updating consent: " + data.message);
+                  }
+              })
+              .catch(error => {
+                  console.error("Error:", error);
+                  alert("Unexpected error occurred. Check console for details.");
+              });
+          });
+        });
+    </script>
+
+    <div class="footer">
+      <hr/>
+      <!-- Footer text or disclaimers as needed -->
+      <p>© 2025 Georgia State University. All rights reserved.</p>
+    </div>
+
+  </div>
+</body>
+</html>

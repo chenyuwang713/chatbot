@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat with AI</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .chat-container {
+            background-color: #ffffff;
+            width: 500px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+        }
+        #chat-box {
+            width: 100%;
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+        .message {
+            padding: 10px;
+            margin: 6px 0;
+            border-radius: 6px;
+            word-wrap: break-word;
+        }
+        .ai-message {
+            background-color: #e8edff;
+            text-align: left;
+        }
+        .user-message {
+            background-color: #d1f7e0;
+            text-align: right;
+        }
+        .end-message {
+            text-align: center;
+            font-weight: bold;
+            color: #888;
+            margin-top: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 20%;
+            padding: 0px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            resize: vertical;
+        }
+        button {
+            margin-top: 8px;
+            padding: 10px;
+            width: 100%;
+            background-color: #0078D4;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+        button:hover:not(:disabled) {
+            background-color: #005fa3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <h1>Interview Chat</h1>
+
+        <div id="chat-box"></div>
+        <textarea id="user-message" placeholder="Type your message here..." disabled></textarea><br>
+        <button id="send-button" disabled>Send</button>
+        <button id="quit-button" onclick="quitInterview()">Quit Interview</button>
+        <div id="remaining-sends" style="margin-top: 10px; text-align: center; font-weight: bold;">Remaining sends: 50</div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const uid = urlParams.get("uid");
+            if (!uid) {
+                window.location.href = "invalid.html"; // Redirect to invalid page
+                return;
+            }
+            
+            const maxSends = 50;
+            let sendCount = 0;
+
+            // 1) Check user status 
+            try {
+                const response = await fetch(`http://localhost:5001/user/status?uid=${uid}`);
+                const data = await response.json();
+                console.log("User Status API Response:", data);
+
+                if (data.error) {
+                    window.location.href = "invalid.html";
+                } 
+                else if (data.redirect && data.redirect !== `chat.html?uid=${uid}`) {
+                    window.location.href = data.redirect;
+                    return
+                } 
+            } catch (error) {
+                console.error("Error during initialization:", error);
+                window.location.href = "invalid.html";
+            }
+
+            // 2) Fetch the entire chat history from the new endpoint
+            try {
+                const historyResponse = await fetch(`http://localhost:5001/chat_history?uid=${uid}`);
+                const historyData = await historyResponse.json();
+                if (historyData.conversation) {
+                    // Render each message in the chat box
+                                        // Check for "[END OF INTERVIEW]"
+                        if (historyData.conversation.some(msg => msg.content.includes("[END OF INTERVIEW]"))) {
+                            window.location.href = "complete.html";
+                            return;
+                        }
+                    for (let msg of historyData.conversation) {
+                        const msgClass = msg.sender === "user" ? "user-message" : "ai-message";
+                        const messageHtml = `<div class="message ${msgClass}">${msg.content}</div>`;
+                        document.getElementById("chat-box").innerHTML += messageHtml;
+                    }
+
+                    historyData.conversation.forEach(msg => {
+                    if (msg.sender === "user") {
+                            sendCount++;
+                        }
+                    });
+                    // Update the remaining sends display based on the actual count
+                    if (historyData.remaining_sends !== undefined) {
+                        document.getElementById("remaining-sends").textContent = `Remaining sends: ${historyData.remaining_sends}`;
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching chat history:", err);
+            }
+            document.getElementById("chat-box").scrollTop = document.getElementById("chat-box").scrollHeight;
+
+            // 3) Fetch or initialize the AI’s initial response if needed
+            //    If your existing logic calls POST /chat with an empty message
+            //    to get the first AI response, you can do that here if desired.
+
+            try {
+                const chatInitResponse = await fetch("http://localhost:5001/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ uid, message: "" }),
+                });
+                const chatData = await chatInitResponse.json();
+                if (chatData.assistant) {
+                    const aiMessage = `<div class="message ai-message">${chatData.assistant}</div>`;
+                    document.getElementById("chat-box").innerHTML += aiMessage;
+                }
+            } catch (error) {
+                console.error("Error fetching initial AI response:", error);
+            }
+            // Enable input and send button now that everything is loaded
+            document.getElementById("user-message").disabled = false;
+            document.getElementById("send-button").disabled = false;
+
+            // 4) Implement sendMessage() for user interactions
+            window.sendMessage = async function() {
+                const message = document.getElementById("user-message").value;
+                const chatBox = document.getElementById("chat-box");
+                
+                if (!message) {
+                    // Do nothing if the message is empty
+                    return;
+                }
+                                
+                // Limit to a maximum of 50 sends
+                if (sendCount >= 50) {
+                    alert("You have reached the maximum number of messages allowed.");
+                    document.getElementById("send-button").disabled = true;
+                    return;
+                }
+                
+                sendCount++;
+                document.getElementById("user-message").disabled = true;
+                document.getElementById("send-button").disabled = true;
+
+                // Display user message
+                const userMessage = `<div class="message user-message">${message}</div>`;
+                chatBox.innerHTML += userMessage;
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                // Call the /chat POST endpoint
+                try {
+                    const response = await fetch(`http://localhost:5001/chat`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ uid, message })
+                    });
+                    const data = await response.json();
+
+                    // Display AI response
+                    const aiMessage = `<div class="message ai-message">${data.assistant}</div>`;
+                    chatBox.innerHTML += aiMessage;
+                    chatBox.scrollTop = chatBox.scrollHeight;
+
+                    // Update remaining sends display using the server-provided value
+                    if (data.remaining_sends !== undefined) {
+                        document.getElementById("remaining-sends").textContent = `Remaining sends: ${data.remaining_sends}`;
+                    }
+
+                    // Check for "[END OF INTERVIEW]"
+                    if (data.assistant && data.assistant.includes("[END OF INTERVIEW]")) {
+                        const endMessage = `<div class="end-message">End of Conversation</div>`;
+                        chatBox.innerHTML += endMessage;
+                    } else {
+                        // Re-enable input
+                        document.getElementById("user-message").value = "";
+                        document.getElementById("user-message").disabled = false;
+                        document.getElementById("send-button").disabled = false;
+                    }
+                } catch (error) {
+                    console.error("Error sending message:", error);
+                    document.getElementById("user-message").disabled = false;
+                    document.getElementById("send-button").disabled = false;
+                }
+            }
+
+            // Attach sendMessage to the button's onclick event
+            document.getElementById("send-button").onclick = sendMessage;
+
+            window.quitInterview = async function () {
+                if (!confirm("Are you sure you want to quit the interview? This action cannot be undone.")) {
+                    return;
+                }
+
+                try {
+                    // Optionally, record the quit action by sending a special message
+                    await fetch(`http://localhost:5001/chat`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ uid, message: "[END OF INTERVIEW]" })
+                    });
+                } catch (error) {
+                    console.error("Error quitting interview:", error);
+                }
+                // Redirect to the complete status page
+                window.location.href = "complete.html";
+            };
+    });
+    </script>
+
+   
+</body>
+</html>

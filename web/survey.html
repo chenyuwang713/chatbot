@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Survey – Background Information</title>
+  <style>
+    body {
+      margin: 0; 
+      padding: 0; 
+      font-family: Arial, sans-serif; 
+      background-color: #f8f8f8;
+    }
+    .container {
+      max-width: 800px; 
+      margin: 40px auto; 
+      background-color: #fff; 
+      padding: 30px; 
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .logo {
+      display: block; 
+      margin: 0 auto 20px; 
+      width: 100px; /* Adjust as needed */
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    form p {
+      font-weight: bold;
+      margin-top: 20px;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin: 4px 0;
+      font-weight: normal;
+      color: #555;
+    }
+    input[type="text"] {
+      display: block;
+      width: 300px;
+      padding: 6px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .submit-button {
+      margin-top: 20px;
+      text-align: center;
+    }
+    button {
+      background-color: #0078D4; 
+      border: none; 
+      color: #fff; 
+      padding: 10px 20px; 
+      font-size: 16px; 
+      cursor: pointer; 
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #005fa3;
+    }
+    .footer {
+      text-align: center; 
+      font-size: 0.9em; 
+      color: #999; 
+      margin-top: 40px;
+    }
+    hr {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Logo (Update path if needed) -->
+    <img src="logo.png" alt="Organization Logo" class="logo" />
+
+    <h1>Background Information</h1>
+
+    <form id="survey-form">
+      <p>Which race or ethnicity best describes you?</p>
+      <label><input type="radio" name="race" value="American Indian or Alaskan Native" required /> American Indian or Alaskan Native</label>
+      <label><input type="radio" name="race" value="Asian or Pacific Islander" required /> Asian or Pacific Islander</label>
+      <label><input type="radio" name="race" value="Black or African American" required /> Black or African American</label>
+      <label><input type="radio" name="race" value="Hispanic" required /> Hispanic</label>
+      <label><input type="radio" name="race" value="White or Caucasian" required /> White or Caucasian</label>
+      <label><input type="radio" name="race" value="Multiple or Other" required /> Multiple ethnicity or Other</label>
+      <input type="text" name="race_other" placeholder="Please specify if other" id="race_other" disabled />
+
+
+      <p>How do you identify yourself?</p>
+      <label><input type="radio" name="gender" value="Female" required /> Female</label>
+      <label><input type="radio" name="gender" value="Male" required /> Male</label>
+      <label><input type="radio" name="gender" value="Non-binary" required /> Non-binary</label>
+
+      <p>In what capacity are you working as an education leader?</p>
+      <label><input type="radio" name="role" value="Principal" required /> Principal</label>
+      <label><input type="radio" name="role" value="Assistant Principal" required /> Assistant Principal</label>
+      <label><input type="radio" name="role" value="Administrator" required /> Administrator</label>
+      <label><input type="radio" name="role" value="Superintendent" required /> Superintendent</label>
+      <label><input type="radio" name="role" value="Finance related" required /> Finance related</label>
+      <label><input type="radio" name="role" value="Board member" required /> Board member</label>
+      <label><input type="radio" name="role" value="Other" required /> If other, please specify:</label>
+      <input type="text" name="role_other" placeholder="Other role" id="role_other" disabled />
+
+      <p>How much experience do you have as an education leader?</p>
+      <input type="text" name="experience" placeholder="(e.g., 5 years, 10 years, etc.)" required />
+
+      <p>What category of school are you working for (or have worked for)?</p>
+      <label><input type="radio" name="school_type" value="Rural" required /> Rural</label>
+      <label><input type="radio" name="school_type" value="Urban" required /> Urban</label>
+      <label><input type="radio" name="school_type" value="Both" required /> Both</label>
+      <label><input type="radio" name="school_type" value="Other" required /> If other, please specify:</label>
+      <input type="text" name="school_other" placeholder="Other school type" id="school_other" disabled />
+
+      <p>How often do you use Artificial Intelligence for making decisions?</p>
+      <label><input type="radio" name="ai_usage" value="Very often" required /> Very often</label>
+      <label><input type="radio" name="ai_usage" value="Often" required /> Often</label>
+      <label><input type="radio" name="ai_usage" value="Sometimes" required /> Sometimes</label>
+      <label><input type="radio" name="ai_usage" value="Rarely" required /> Rarely</label>
+      <label><input type="radio" name="ai_usage" value="Not at all" required /> Not at all</label>
+
+
+      <div class="submit-button">
+        <button type="submit">Submit</button>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const urlParams = new URLSearchParams(window.location.search);
+                const uid = urlParams.get("uid");
+            
+                if (!uid) {
+                    window.location.href = "invalid.html"; // Redirect to invalid page
+                    return;
+                }
+            
+                fetch(`http://localhost:5001/user/status?uid=${uid}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("User Status API Response:", data);  // Log response
+                
+                        if (data.error) {
+                            window.location.href = "invalid.html"; // Invalid UID
+                        } 
+                        if (data.redirect && data.redirect !== `survey.html?uid=${uid}`) {
+                          window.location.href = data.redirect; // ✅ Only redirect if not already on survey.html
+                      }
+                    })
+                .catch(error => {
+                    console.error("Error checking user status:", error);
+                    window.location.href = "invalid.html"; // Handle any failures
+                }); 
+            });
+
+            document.querySelectorAll('input[name="race"]').forEach(radio => {
+              radio.addEventListener("change", function() {
+                  document.getElementById("race_other").disabled = this.value !== "Multiple or Other";
+              });
+            });
+        
+            document.querySelectorAll('input[name="role"]').forEach(radio => {
+                radio.addEventListener("change", function() {
+                    document.getElementById("role_other").disabled = this.value !== "Other";
+                });
+            });
+        
+            document.querySelectorAll('input[name="school_type"]').forEach(radio => {
+                radio.addEventListener("change", function() {
+                    document.getElementById("school_other").disabled = this.value !== "Other";
+                });
+            }); 
+
+            document.getElementById("survey-form").addEventListener("submit", async function(event) {
+                event.preventDefault();
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const uid = urlParams.get("uid");
+            
+                const formData = new FormData(this);
+                const surveyData = { uid: uid }; // Ensure UID is included
+            
+                formData.forEach((value, key) => {
+                    surveyData[key] = value;
+                });
+
+                surveyData["uid"] = uid;  // Ensure UID is included
+            
+                try {
+                    const response = await fetch("http://localhost:5001/submit_survey", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(surveyData),
+                    });
+
+                    if (response.ok) {
+                        window.location.href = `chat.html?uid=${uid}`; // Redirect to chatbot page
+                    } else {
+                        alert("Failed to submit survey. Please try again.");
+                    }
+    
+                } catch (error) {
+                    console.error("Survey submission error:", error);
+                    alert("Network error. Please try again.");
+                }
+            });
+
+            
+        </script>
+      </div>
+    </form>
+
+    <div class="footer">
+      <hr/>
+      <p>© 2025 Georgia State University. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
