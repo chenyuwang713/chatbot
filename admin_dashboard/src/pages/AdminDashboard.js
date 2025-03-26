@@ -35,7 +35,7 @@ const AdminDashboard = () => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
     
         try {
-            const response = await fetch(`HTTP://18.119.102.36:5001/delete_user?uid=${identifier}`, {
+            const response = await fetch(`http://18.119.102.36:5001/delete_user?uid=${identifier}`, {
                 method: "DELETE",
             });
     
@@ -52,7 +52,7 @@ const AdminDashboard = () => {
 
     const fetchUploadedEmails = async (token) => {
         try {
-            const response = await axios.get(`HTTP://18.119.102.36:5001/get_uploaded_emails`, {
+            const response = await axios.get(`http://18.119.102.36:5001/get_uploaded_emails`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const usersWithLinks = (response.data.users || []).map(user => ({

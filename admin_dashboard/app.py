@@ -13,11 +13,7 @@ app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "supersecretkey")
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 bcrypt = Bcrypt(app)
-
-
-
-
-CORS(app, resources={r"/admin/*": {"origins": "http://18.119.102.36:3001"}}, supports_credentials=True, allow_headers=["Content-Type"])
+CORS(app, resources={r"/admin/*": {"origins": 'http://18.119.102.36:3001'}}, supports_credentials=True, allow_headers=["Content-Type"])
 # Admin model
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)

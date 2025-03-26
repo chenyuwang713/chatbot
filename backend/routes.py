@@ -71,8 +71,6 @@ from flask_jwt_extended import jwt_required
 
 routes = Blueprint('routes', __name__)
 
-
-
 @routes.route('/user/status', methods=['GET'])
 def check_user_status():
     """Check the user's agreement, survey completion, and chat history status."""
@@ -102,7 +100,7 @@ def check_user_status():
         return jsonify({"redirect": f"chat.html?uid={uid}"}), 200  # Load chat history
 
 @routes.route('/upload_emails', methods=['POST'])
-@cross_origin(origin="http://18.119.102.36:3001", supports_credentials=True)
+@cross_origin(origin='http://18.119.102.36:3001', supports_credentials=True)
 @jwt_required()
 def upload_emails():
     """Handle email uploads and store them in the database."""
@@ -133,7 +131,7 @@ def upload_emails():
         return jsonify({"error": str(e)}), 500
     
 @routes.route('/get_uploaded_emails', methods=['GET'])
-@cross_origin(origin="http://18.119.102.36:3001", supports_credentials=True)
+@cross_origin(origin='http://18.119.102.36:3001', supports_credentials=True)
 @jwt_required()
 def get_uploaded_emails():
     """Retrieve all uploaded emails from the database."""
@@ -145,7 +143,7 @@ def get_uploaded_emails():
         return jsonify({"error": str(e)}), 500
 
 @routes.route('/submit_survey', methods=['POST'])
-@cross_origin(origin="http://18.119.102.36:8080", supports_credentials=True)
+@cross_origin(origin='http://18.119.102.36:8080', supports_credentials=True)
 def submit_survey():
     """Store survey responses in the database."""
     try:
@@ -207,7 +205,7 @@ def get_chat_history():
     return jsonify({"conversation": conversation, "remaining_sends": remaining_sends}), 200
 
 @routes.route('/chat', methods=['POST'])
-@cross_origin(origin="http://18.119.102.36:3001", supports_credentials=True)
+@cross_origin(origin='http://18.119.102.36:3001', supports_credentials=True)
 def chat():
 
     max_sends = 50
@@ -302,7 +300,7 @@ def admin_register():
     return jsonify({'message': 'Admin registered successfully'}), 201
 
 @routes.route('/admin/login', methods=['POST', 'OPTIONS'])
-@cross_origin(origin="http://18.119.102.36:3001", supports_credentials=True)
+@cross_origin(origin='http://18.119.102.36:3001', supports_credentials=True)
 def admin_login():
     if request.method == 'OPTIONS':  # Handle preflight request
         response = make_response()
@@ -324,13 +322,13 @@ def admin_login():
 
 
 @routes.route('/delete_user', methods=['DELETE', 'OPTIONS'])
-@cross_origin(origin="http://18.119.102.36:3001", supports_credentials=True)
+@cross_origin(origin='http://18.119.102.36:3001', supports_credentials=True)
 def delete_user():
     """Delete a user by UID."""
     # Handle preflight request
     if request.method == "OPTIONS":
         response = make_response()
-        response.headers["Access-Control-Allow-Origin"] = "http://18.119.102.36:3001"
+        response.headers["Access-Control-Allow-Origin"] = 'http://18.119.102.36:3001'
         response.headers["Access-Control-Allow-Methods"] = "DELETE, OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
         return response, 200
@@ -354,7 +352,7 @@ def delete_user():
     
     
 @routes.route('/update_consent', methods=['POST'])
-@cross_origin(origin="http://18.119.102.36:3001", supports_credentials=True)
+@cross_origin(origin='http://18.119.102.36:3001', supports_credentials=True)
 def update_consent():
     
     data = request.json

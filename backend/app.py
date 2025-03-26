@@ -19,8 +19,7 @@ jwt = JWTManager(app)
 # Register routes
 app.register_blueprint(routes)
 
-
-CORS(app, resources={r"/*": {"origins": "http://18.119.102.36:8080"}}, supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": 'http://18.119.102.36:8080'}}, supports_credentials=True)
 
 # Ensure an admin is created at startup
 with app.app_context():
