@@ -90,6 +90,7 @@
     </div>
 
     <script>
+        const BACKEND_URL = "http://18.119.102.36:5001";
         document.addEventListener("DOMContentLoaded", async function () {
             const urlParams = new URLSearchParams(window.location.search);
             const uid = urlParams.get("uid");
@@ -103,7 +104,7 @@
 
             // 1) Check user status 
             try {
-                const response = await fetch(`http://localhost:5001/user/status?uid=${uid}`);
+                const response = await fetch(`HTTP://18.119.102.36:5001/user/status?uid=${uid}`);
                 const data = await response.json();
                 console.log("User Status API Response:", data);
 
@@ -121,7 +122,7 @@
 
             // 2) Fetch the entire chat history from the new endpoint
             try {
-                const historyResponse = await fetch(`http://localhost:5001/chat_history?uid=${uid}`);
+                const historyResponse = await fetch(`HTTP://18.119.102.36:5001/chat_history?uid=${uid}`);
                 const historyData = await historyResponse.json();
                 if (historyData.conversation) {
                     // Render each message in the chat box
@@ -156,7 +157,7 @@
             //    to get the first AI response, you can do that here if desired.
 
             try {
-                const chatInitResponse = await fetch("http://localhost:5001/chat", {
+                const chatInitResponse = await fetch("HTTP://18.119.102.36:5001/chat", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ uid, message: "" }),
@@ -201,7 +202,7 @@
 
                 // Call the /chat POST endpoint
                 try {
-                    const response = await fetch(`http://localhost:5001/chat`, {
+                    const response = await fetch(`HTTP://18.119.102.36:5001/chat`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ uid, message })
@@ -245,7 +246,7 @@
 
                 try {
                     // Optionally, record the quit action by sending a special message
-                    await fetch(`http://localhost:5001/chat`, {
+                    await fetch(`HTTP://18.119.102.36:5001/chat`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ uid, message: "[END OF INTERVIEW]" })

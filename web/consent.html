@@ -144,6 +144,7 @@
     </div>
 
     <script>
+        const BACKEND_URL = "http://18.119.102.36:5001";
         document.addEventListener("DOMContentLoaded", function () {
             const urlParams = new URLSearchParams(window.location.search);
             const uid = urlParams.get("uid");
@@ -154,7 +155,7 @@
                   return;
               }
           
-              fetch("http://localhost:5001/update_consent", {
+              fetch(`HTTP://18.119.102.36:5001/update_consent`, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ uid: uid })

@@ -9,7 +9,7 @@ const Login = () => {
     const handleLogin = async (event) => {
         event.preventDefault();
         try {
-            const response = await fetch("http://localhost:5001/admin/login", {
+            const response = await fetch(`http://18.119.102.36:5001/admin/login`, {
                 method: "POST",
                 mode: "cors",  // Ensures CORS headers are respected
                 credentials: "include", // Allows sending credentials if needed
@@ -23,7 +23,7 @@ const Login = () => {
             const data = await response.json();
             if (data.access_token) {
                 localStorage.setItem("admin_token", data.access_token);
-                window.location.href = "http://localhost:3001/dashboard";
+                window.location.href = `http://18.119.102.36:3001/dashboard`;
             } else {
                 setError("Invalid credentials. Please try again.");
             }

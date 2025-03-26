@@ -129,6 +129,7 @@
         <button type="submit">Submit</button>
 
         <script>
+          const BACKEND_URL="http://18.119.102.36:5001"
             document.addEventListener("DOMContentLoaded", function () {
                 const urlParams = new URLSearchParams(window.location.search);
                 const uid = urlParams.get("uid");
@@ -138,7 +139,7 @@
                     return;
                 }
             
-                fetch(`http://localhost:5001/user/status?uid=${uid}`)
+                fetch(`HTTP://18.119.102.36:5001/user/status?uid=${uid}`)
                     .then(response => response.json())
                     .then(data => {
                         console.log("User Status API Response:", data);  // Log response
@@ -190,7 +191,7 @@
                 surveyData["uid"] = uid;  // Ensure UID is included
             
                 try {
-                    const response = await fetch("http://localhost:5001/submit_survey", {
+                    const response = await fetch(`HTTP://18.119.102.36:5001/submit_survey`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(surveyData),

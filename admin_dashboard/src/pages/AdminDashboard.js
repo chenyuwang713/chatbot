@@ -29,23 +29,13 @@ const AdminDashboard = () => {
     };
 
 
-    // const fetchResponses = async (token) => {
-    //     try {
-    //         const response = await axios.get("http://localhost:5001/get_all_responses", {
-    //             headers: { Authorization: `Bearer ${token}` },
-    //         });
-    //         setResponses(response.data.responses || []);
-    //     } catch (error) {
-    //         setError("Failed to fetch responses");
-    //         console.error("Error fetching responses:", error);
-    //     }
-    // };
+
 
     const handleDeleteUser = async (identifier) => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
     
         try {
-            const response = await fetch(`http://localhost:5001/delete_user?uid=${identifier}`, {
+            const response = await fetch(`HTTP://18.119.102.36:5001/delete_user?uid=${identifier}`, {
                 method: "DELETE",
             });
     
@@ -62,12 +52,12 @@ const AdminDashboard = () => {
 
     const fetchUploadedEmails = async (token) => {
         try {
-            const response = await axios.get("http://localhost:5001/get_uploaded_emails", {
+            const response = await axios.get(`HTTP://18.119.102.36:5001/get_uploaded_emails`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const usersWithLinks = (response.data.users || []).map(user => ({
                 ...user,
-                surveyLink: `http://localhost:8080/?uid=${user.identifier}` // Ensure survey link is generated
+                surveyLink: `http://18.119.102.36:8080/?uid=${user.identifier}` // Ensure survey link is generated
             }));
             
             setUploadedUsers(usersWithLinks);
@@ -92,11 +82,11 @@ const AdminDashboard = () => {
 
         const updatedUsers = users.map(user => ({
             ...user,
-            surveyLink: `http://localhost:8080/?uid=${user.identifier}` // Generate survey link
+            surveyLink: `http://18.119.102.36:8080/?uid=${user.identifier}` // Generate survey link
         }));
 
         try {
-            await axios.post("http://localhost:5001/upload_emails", { users }, {
+            await axios.post(`http://18.119.102.36:5001/upload_emails`, { users }, {
                 headers: { Authorization: `Bearer ${localStorage.getItem("admin_token")}` },
             });
 
